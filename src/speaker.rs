@@ -6,7 +6,7 @@ use crate::{
 };
 use roxmltree::{Document, Node};
 use rupnp::{ssdp::URN, Device};
-use std::{collections::HashMap, net::Ipv4Addr};
+use std::{collections::HashMap, net::IpAddr, net::SocketAddr};
 
 pub(crate) const SONOS_URN: URN = URN::device("schemas-upnp-org", "ZonePlayer", 1);
 
@@ -39,8 +39,18 @@ impl Speaker {
 
     /// Creates a speaker from an IPv4 address.
     /// It returns `Ok(None)` when the device was found but isn't a sonos player.
-    pub async fn from_ip(addr: Ipv4Addr) -> Result<Option<Self>> {
+    pub async fn from_ip(addr: IpAddr) -> Result<Option<Self>> {
         let uri = format!("http://{}:1400/xml/device_description.xml", addr)
+            .parse()
+            .expect("is always valid");
+
+        Ok(Device::from_url(uri).await.map(Speaker::from_device)?)
+    }
+
+    /// Creates a speaker from a network address.
+    /// It returns `Ok(None)` when the device was found but isn't a sonos player.
+    pub async fn from_address(addr: SocketAddr) -> Result<Option<Self>> {
+        let uri = format!("http://{}/xml/device_description.xml", addr)
             .parse()
             .expect("is always valid");
 
