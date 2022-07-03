@@ -7,7 +7,7 @@ use std::{
 };
 
 /// This enum describes how Sonos repeats the current playlist.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RepeatMode {
     /// The playlist doesn't get repeated.
     None,
@@ -52,7 +52,7 @@ impl std::str::FromStr for RepeatMode {
 
 /// A more lightweight representation of a speaker containing only the name, uuid and location.
 /// It gets returned by the [zone_group_state](struct.Speaker.html#method.zone_group_state) function.
-#[derive(Debug, Eq)]
+#[derive(Clone, Debug, Eq)]
 pub struct SpeakerInfo {
     pub(crate) name: String,
     pub(crate) uuid: String,
